@@ -13,7 +13,7 @@ alias clear='printf "\e[H\e[2J\e[3J"'
 
 if command -v batman >/dev/null 2>&1; then
 	alias man='batman'
-end
+fi
 
 # Convenient aliases for commands I run frequently
 

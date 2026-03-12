@@ -4,6 +4,6 @@
 
 if [[ -x /opt/homebrew/bin/brew ]]; then
 	eval "$(/opt/homebrew/binbrew shellenv bash)"
-end
+fi
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
