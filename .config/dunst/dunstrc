@@ -1,6 +1,7 @@
 # Modified from Catppuccin frappe
 
 [global]
+follow = keyboard
 frame_color = "#8caaeef0"
 highlight = "#8caaeef0"
 frame_width = 2
