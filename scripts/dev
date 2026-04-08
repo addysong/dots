@@ -3,15 +3,22 @@
 # Project directory is provided as an argument, defaulting to the cwd
 DIR="${1:-$(pwd)}"
 
+if [[ ! -d "$DIR" ]]; then
+	echo "'$DIR' is not a valid directory" >&2
+	exit 1
+fi
+
 # Assign a unique session per project
 SESSION="dev$(realpath "$DIR" | tr '/.:' '-')"
 
 # Attach if a session for this project has already been created
-if tmux has-session -t "$SESSION"; then
-	echo "Session '$SESSION' already exists."
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+	echo "Session '$SESSION' found... attaching now" >&2
 	tmux attach-session -t "$SESSION"
 	exit 0
 fi
+
+echo "Creating session '$SESSION'" >&2
 
 # Window 1: Code
 
@@ -40,3 +47,5 @@ fi
 # Finally, focus the Bash window and attach the session
 tmux select-window -t "$SESSION:Bash"
 tmux attach-session -t "$SESSION"
+
+echo "Session attached"
