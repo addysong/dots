@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+
+# Imports
+from sys import argv, exit
+from random import randint
+import os
+
+os.system("")  # Windows compatibility, I guess
+
+roll_t = tuple[int, int, int]  # Rolls represented as (num_rolls, sides, mod)
+
+## ANSI Escape Sequences and styling ##
+
+RESET = "\033[0m"
+
+BOLD = "\033[1m"
+FAINT = "\033[2m"
+ITALIC = "\033[3m"
+
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
+
+
+class Theme:
+    c1: str
+    c2: str
+    lo: str
+    hi: str
+
+    def __init__(self, c1: str, c2: str, lo: str = RED, hi: str = GREEN):
+        self.c1, self.c2, self.lo, self.hi = c1, c2, lo, hi
+
+
+themes = {
+    "default": Theme(WHITE, YELLOW),
+    "aqua": Theme(BLUE, CYAN, hi=YELLOW),
+    "leaf": Theme(GREEN, CYAN, hi=YELLOW),
+    "rose": Theme(RED, MAGENTA, lo=BLACK),
+}
+
+## Help ##
+
+HELP_THEMES = "\n      ".join(
+    [f"{v.c1}- {k[:len(k)//2]}{v.c2}{k[len(k)//2:]}{RESET}" for k, v in themes.items()]
+)
+HELP_STRING = f"""
+HELP:
+  Enter rolls separated by spaces. Possible roll formats include:
+    - {ITALIC}{BLUE}(number_of_rolls){RESET}{ITALIC}d{BLUE}(sides){RESET}
+    - {ITALIC}{BLUE}(sides){RESET} as a shorthand when only rolling one die
+    - Adding {ITALIC}+{BLUE}(mod){RESET} or {ITALIC}-{BLUE}(mod){RESET} on the end of a roll to add a
+      positive or negative modifier to the roll total
+
+  Examples:
+    {ITALIC}roll 1d20    {RESET}  # Roll 1d20
+    {ITALIC}roll 2d6 1d20{RESET}  # Roll 2d6 and 1d20
+    {ITALIC}roll 20      {RESET}  # Roll 1d20
+    {ITALIC}roll 2d6+2   {RESET}  # Roll 2d6 with a +2 modifier on the total
+
+  Themes:
+    You can specify a color theme before listing the rolls. Themes include:
+      {HELP_THEMES}
+"""
+
+
+def print_help() -> None:
+    print(HELP_STRING)
+
+
+## Helper functions ##
+
+
+def roll_str(roll: roll_t) -> str:
+    [num_rolls, sides, mod] = roll
+    if mod == 0:
+        return f"{num_rolls}d{sides}"
+    return f"{num_rolls}d{sides}{mod:+}"
+
+
+def parse_roll(roll_str: str) -> roll_t:
+    mod = 0
+    if "+" in roll_str:
+        [roll_str, mod_str] = roll_str.split("+")
+        mod = int(mod_str)
+    if "-" in roll_str:
+        [roll_str, mod_str] = roll_str.split("-")
+        mod = -int(mod_str)
+
+    if "d" not in roll_str:
+        return 1, int(roll_str), mod
+    [num_rolls, sides] = [int(num) for num in roll_str.split("d")]
+    return num_rolls, sides, mod
+
+
+def print_single_roll(roll: roll_t, theme: Theme, alt: bool) -> None:
+    [_, sides, mod] = roll
+    result = randint(1, sides)
+    color = theme.c2 if alt else theme.c1
+    result_color = color
+    if result == sides:
+        result_color = theme.hi
+    elif result == 1:
+        result_color = theme.lo
+
+    if mod:
+        print(
+            f"    {color}{roll_str(roll)}: {result_color}{BOLD}{result+mod}{RESET} {result_color}{FAINT}{ITALIC}(nat {result}){RESET}"
+        )
+    else:
+        print(f"    {color}{roll_str(roll)}: {result_color}{BOLD}{result}{RESET}")
+
+
+def print_roll(roll: roll_t, theme: Theme, alt: bool) -> None:
+    [num_rolls, sides, mod] = roll
+    if num_rolls == 1:
+        print_single_roll(roll, theme, alt)
+        return
+    results = [randint(1, sides) for _ in range(num_rolls)]
+    total = sum(results)
+    color = theme.c2 if alt else theme.c1
+    print(f"    {color}{ITALIC}{results}{RESET}")
+    if mod:
+        print(
+            f"    {color}{roll_str(roll)}: {BOLD}{total+mod}{RESET} {color}{FAINT}{ITALIC}(raw {total}){RESET}"
+        )
+    else:
+        print(f"    {color}{roll_str(roll)}: {BOLD}{total}{RESET}")
+
+
+## Main script starts here ##
+
+
+try:
+    non_roll_args = 1
+    if len(argv) < 2 or argv[1] in ["help", "h", "--help", "-h", "?"]:
+        print_help()
+        exit(0)
+
+    theme = themes["default"]
+    if argv[1] in themes:
+        theme = themes[argv[1]]
+        non_roll_args += 1
+
+    rolls = [parse_roll(roll_str) for roll_str in argv[non_roll_args:]]
+    if len(rolls) < 1:
+        raise Exception("No rolls given")
+
+    odd_row = True
+    for roll in rolls:
+        print()
+        if odd_row:
+            print_roll(roll, theme, alt=False)
+        else:
+            print_roll(roll, theme, alt=True)
+        odd_row = not odd_row
+
+    print(RESET)
+except Exception:
+    print(f"\n{RED}{BOLD}Invalid input!{RESET}")
+    print_help()
+    exit(2)

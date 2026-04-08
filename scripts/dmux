@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# Project directory is provided as an argument, defaulting to the cwd
+DIR="${1:-$(pwd)}"
+
+# Assign a unique session per project
+SESSION="dev$(realpath "$DIR" | tr '/.:' '-')"
+
+# Attach if a session for this project has already been created
+if tmux has-session -t "$SESSION"; then
+	echo "Session '$SESSION' already exists."
+	tmux attach-session -t "$SESSION"
+	exit 0
+fi
+
+# Window 1: Code
+
+tmux new-session -d -s "$SESSION" -n "Code" -c "$DIR"
+
+tmux split-window -h -p 40 -t "$SESSION:Code"
+tmux send-keys -t "$SESSION:Code.right" "claude" Enter
+
+tmux send-keys -t "$SESSION:Code.left" "nvim ." Enter
+
+# Window 2: Bash
+
+tmux new-window -t "$SESSION" -n "Bash"
+
+# Window 3: Tools
+
+tmux new-window -t "$SESSION" -n "Tools"
+
+# Window 4: Git
+
+if [[ -e "$DIR/.git" ]]; then
+	tmux new-window -t "$SESSION" -n "Git"
+	tmux send-keys -t "$SESSION:Git" "lazygit" Enter
+fi
+
+# Finally, focus the Bash window and attach the session
+tmux select-window -t "$SESSION:Bash"
+tmux attach-session -t "$SESSION"
