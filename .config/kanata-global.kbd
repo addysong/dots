@@ -1,0 +1,15 @@
+;; Remaps Meta to Ctrl+Shift globally.
+;; Chains off the virtual device produced by kanata.kbd (which passes lmet through
+;; via process-unmapped-keys), and directly grabs all other devices.
+
+(defcfg
+  process-unmapped-keys yes
+)
+
+(defsrc
+  lmet rmet
+)
+
+(deflayer base
+  (multi lctl lsft) (multi rctl rsft)
+)
