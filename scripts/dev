@@ -8,8 +8,10 @@ if [[ ! -d "$DIR" ]]; then
 	exit 1
 fi
 
+cd "$DIR" || exit 1
+
 # Assign a unique session per project
-SESSION="dev$(realpath "$DIR" | tr '/.:' '-')"
+SESSION="dev$(realpath . | tr '/.:' '-')"
 
 # Attach if a session for this project has already been created
 if tmux has-session -t "$SESSION" 2>/dev/null; then
@@ -22,7 +24,7 @@ echo "Creating session '$SESSION'" >&2
 
 # Window 1: Code
 
-tmux new-session -d -s "$SESSION" -n "Code" -c "$DIR"
+tmux new-session -d -s "$SESSION" -n "Code"
 
 tmux split-window -h -p 40 -t "$SESSION:Code"
 tmux send-keys -t "$SESSION:Code.right" "claude" Enter
