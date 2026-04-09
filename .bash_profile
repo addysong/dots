@@ -3,7 +3,7 @@
 #
 
 if [[ -x /opt/homebrew/bin/brew ]]; then
-	eval "$(/opt/homebrew/binbrew shellenv bash)"
+	eval "$(/opt/homebrew/bin/brew shellenv bash)"
 fi
 
 if type brew &>/dev/null; then
