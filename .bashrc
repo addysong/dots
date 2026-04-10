@@ -58,7 +58,11 @@ export FZF_DEFAULT_OPTS=" \
 
 eval "$(starship init bash)"
 eval "$(zoxide init bash)"
-eval "$(mise activate bash)"
 
 # opencode
 export PATH=/home/addys/.opencode/bin:$PATH
+
+# Automatically source python venv in tmux if it has already been started
+if [[ -n "$VIRTUAL_ENV" ]]; then
+	source "$VIRTUAL_ENV/bin/activate"
+fi
