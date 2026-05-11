@@ -58,6 +58,7 @@ export FZF_DEFAULT_OPTS=" \
 
 eval "$(starship init bash)"
 eval "$(zoxide init bash)"
+eval "$(direnv hook bash)"
 
 # opencode
 export PATH=/home/addys/.opencode/bin:$PATH

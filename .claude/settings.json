@@ -1,9 +1,37 @@
 {
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true
+  "permissions": {
+    "allow": [
+      "Read",
+      "WebFetch",
+      "Web Search",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(ls *)",
+      "Bash(python *)",
+      "Bash(pytest *)",
+      "Bash(pre-commit *)"
+    ],
+    "deny": []
   },
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
-  }
+  },
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true,
+    "caveman@caveman": true
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "theme": "dark",
+  "editorMode": "normal",
+  "tui": "fullscreen"
 }

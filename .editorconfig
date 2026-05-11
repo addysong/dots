@@ -9,6 +9,14 @@ indent_style = tab
 [*.lua]
 indent_style = space
 indent_size = 2
+align_continuous_assign_statement = false
+align_continuous_rect_table_field = false
+align_array_table = false
+
+[*.luau]
+indent_style = tab
+indent_size = 4
+
 
 [*.go]
 indent_style = tab
