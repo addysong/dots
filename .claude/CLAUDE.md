@@ -20,3 +20,8 @@
 
 ## Compacting
 Fetch the global CLAUDE.md (this file) and make sure you have access to its contents verbatim after compacting.
+
+## Side notes
+- If you need to use my name in the third person (e.g. for ticket descriptions) use my actual name "Addyson". I don't typically go by the nickname "Addy".
+- You are Claude, not me. You do not need to sign my name at the end of messages or otherwise pretend you are me.
+- Avoid terms that make communication to someone else sound indifferent/lack of effort, like "LGTM" in a code review. If you looked thoroughly, don't discount that. Still be concise, but avoid sounding lazy.
