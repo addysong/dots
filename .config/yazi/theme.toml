@@ -2,18 +2,14 @@
 
 # Based on Catppuccin Mocha
 
-# : Manager {{{
-
 [mgr]
-cwd = { fg = "#94e2d5" }
 
-# Hovered
-hovered         = { reversed = true }
-preview_hovered = { underline = true }
+cwd = { fg = "gray" }
+symlink_target = { fg = "blue", italic = true}
 
 # Find
-find_keyword  = { fg = "#f9e2af", bold = true, italic = true, underline = true }
-find_position = { fg = "#f5c2e7", bg = "reset", bold = true, italic = true }
+find_keyword  = { fg = "yellow", bold = true, italic = false, underline = false }
+find_position = { fg = "yellow", bg = "reset", bold = true, italic = true }
 
 # Marker
 marker_copied   = { fg = "#a6e3a1", bg = "#a6e3a1" }
@@ -28,21 +24,18 @@ count_selected = { fg = "#1e1e2e", bg = "#f9e2af" }
 
 # Border
 border_symbol = "│"
-border_style  = { fg = "#7f849c" }
+border_style  = { fg = "darkgray" }
 
-# : }}}
+[indicator]
 
-
-# : Tabs {{{
+current = { bold = true, reversed = false }
+preview = { bold = true, underline = false }
+padding = { open = "→ ", close = "" }
 
 [tabs]
+
 active   = { fg = "#1e1e2e", bg = "#89b4fa", bold = true }
 inactive = { fg = "#89b4fa", bg = "#313244" }
-
-# : }}}
-
-
-# : Mode {{{
 
 [mode]
 
@@ -57,12 +50,8 @@ select_alt  = { fg = "#94e2d5", bg = "#313244" }
 unset_main = { fg = "#1e1e2e", bg = "#f2cdcd", bold = true }
 unset_alt  = { fg = "#f2cdcd", bg = "#313244" }
 
-# : }}}
-
-
-# : Status bar {{{
-
 [status]
+
 # Permissions
 perm_sep   = { fg = "#7f849c" }
 perm_type  = { fg = "#89b4fa" }
@@ -75,20 +64,13 @@ progress_label  = { fg = "#ffffff", bold = true }
 progress_normal = { fg = "#89b4fa", bg = "#45475a" }
 progress_error  = { fg = "#f38ba8", bg = "#45475a" }
 
-# : }}}
-
-
-# : Pick {{{
+sep_left  = { open = "", close = "" }
+sep_right = { open = "", close = "" }
 
 [pick]
 border   = { fg = "#89b4fa" }
 active   = { fg = "#f5c2e7", bold = true }
 inactive = {}
-
-# : }}}
-
-
-# : Input {{{
 
 [input]
 border   = { fg = "#89b4fa" }
@@ -96,30 +78,18 @@ title    = {}
 value    = {}
 selected = { reversed = true }
 
-# : }}}
-
-
-# : Completion {{{
-
 [cmp]
+
 border = { fg = "#89b4fa" }
 
-# : }}}
-
-
-# : Tasks {{{
-
 [tasks]
+
 border  = { fg = "#89b4fa" }
 title   = {}
 hovered = { fg = "#f5c2e7", underline = true }
 
-# : }}}
-
-
-# : Which {{{
-
 [which]
+
 mask            = { bg = "#313244" }
 cand            = { fg = "#94e2d5" }
 rest            = { fg = "#9399b2" }
@@ -127,31 +97,18 @@ desc            = { fg = "#f5c2e7" }
 separator       = "  "
 separator_style = { fg = "#585b70" }
 
-# : }}}
-
-
-# : Help {{{
-
 [help]
+
 on      = { fg = "#94e2d5" }
 run     = { fg = "#f5c2e7" }
 hovered = { reversed = true, bold = true }
 footer  = { fg = "#313244", bg = "#cdd6f4" }
 
-# : }}}
-
-
-# : Notify {{{
-
 [notify]
+
 title_info  = { fg = "#a6e3a1" }
 title_warn  = { fg = "#f9e2af" }
 title_error = { fg = "#f38ba8" }
-
-# : }}}
-
-
-# : File-specific styles {{{
 
 [filetype]
 
@@ -172,5 +129,3 @@ rules = [
 	{ url = "*", fg = "#cdd6f4" },
 	{ url = "*/", fg = "#89b4fa" },
 ]
-
-# : }}}
