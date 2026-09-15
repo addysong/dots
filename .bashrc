@@ -99,3 +99,6 @@ fi
 
 # Disable ctrl+s "freezing" the terminal
 stty -ixon
+
+# Machine-specific config file
+[[ -f ~/.bashrc.local ]] && source ~/.bashrc.local

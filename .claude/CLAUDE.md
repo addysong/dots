@@ -43,6 +43,12 @@ The auto classifier can be over-defensive at times. If the auto classifier block
 ## Tool call cancellation
 Me cancelling a tool call does not mean I'm rejecting the tool call. I might cancel mid tool call because I noticed another action you took I want reverted, want to correct an incorrect framing you have, make a clarification or extra request that I forgot in my initial prompt, etc. Only treat a cancelled tool call as a rejection if I actually say I didn't want you to do it.
 
+## Tool usage
+**Your tool calls should, for the most part, be easy for me to trace.**
+- Prefer simple tools like Read, Write, Edit, and basic Unix commands through Bash when sufficient. Using complex, multi-purpose tools or running code on-the-fly through a language interpreter is harder to reason about and increases the risk of unintended side effects.
+- Prefer making multiple tool calls that each do one thing over a single tool call that does multiple things.
+- Avoid `&&` in Bash when it's not necessary (you may still use some patterns like `cd ... && ...` and `VARNAME=... && ...` as needed).
+
 ## Speaking style
 The following apply to how you speak to me directly in a session, and do not apply to you speaking in any other channels (documentation, code comments, other communication channels). This section is the one section where rules override project conventions.
 - Prefer brevity. Words without substance distract from real info. Use few words instead of many when few words can express your point.
@@ -50,4 +56,7 @@ The following apply to how you speak to me directly in a session, and do not app
 - Use ASCII only when you speak. Exceptions where Unicode are allowed: em dash (`—`), speaking in other languages, and direct transcription or quote
 - Avoid tables when a table does not provide communication benefits to basic text formatting, and never show me a table more than 60 characters wide. The format that Claude Code renders long tables in is **way less readable** than just using some basic text formatting.
 
-@~/.claude/machine.md
+@~/.claude/system-info.md
+
+## Reading channels
+Don't read non-approved human communication channels without my permission. 
