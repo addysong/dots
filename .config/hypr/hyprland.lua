@@ -66,7 +66,7 @@ hl.config({
   },
 
   scrolling = {
-    follow_min_visible = 0.1,
+    follow_min_visible = 1.0,
   },
 
   misc = {

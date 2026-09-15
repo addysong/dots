@@ -56,14 +56,13 @@ local function monitor_index(monitors, name)
   return nil
 end
 
+-- Switch table display
 hl.bind(mod("D"), function()
   local monitors = hl.get_monitors()
   if #monitors == 0 then
     return
   end
 
-  -- Fall back to the default output, then to the first connected one, if the
-  -- last used output is no longer connected.
   local index = monitor_index(monitors, tablet_output) or monitor_index(monitors, tablet_default_output) or 1
 
   tablet_output = monitors[(index % #monitors) + 1].name
@@ -83,6 +82,21 @@ hl.bind(mod("A"), function()
       .. (touchpad_enabled and "enabled" or "disabled")
       .. "'"
   )
+end)
+
+-- Toggle key repeat for game compatibility
+local repeat_rate = nil
+hl.bind(mod("G"), function()
+  local current_rate = hl.get_config("input.repeat_rate")
+  local delay = hl.get_config("input.repeat_delay")
+  if current_rate > 0 then
+    repeat_rate = current_rate
+    hl.config({ input = { repeat_rate = 0 } })
+    hl.exec_cmd("notify-send --urgency=low --icon=input-keyboard 'Disabling key repeat'")
+  else
+    hl.config({ input = { repeat_rate = repeat_rate } })
+    hl.exec_cmd("notify-send --urgency=low --icon=input-keyboard 'Enabling key repeat'")
+  end
 end)
 
 -- Move focus
