@@ -50,7 +50,7 @@ PanelWindow {
     anchors.verticalCenter: parent.verticalCenter
     spacing: Config.barSpacing
 
-    PlayerItem {}
+    WindowTitleItem {}
   }
 
   RowLayout {

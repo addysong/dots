@@ -29,7 +29,9 @@ RowLayout {
         result.push({ id: workspace.id, workspace });
     }
 
-    return result;
+    // Restore numeric ordering after merging pinned and existing workspaces.
+    // This keeps negative-ID special workspaces to the left.
+    return result.sort((a, b) => a.id - b.id);
   }
 
   Connections {
