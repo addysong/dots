@@ -5,12 +5,12 @@ DEFAULT_TITLE = "    "
 
 MODE_DISPLAY = {
     "p": ("󰄛 ", 4),
-    "resize": (" ", 5),
+    "resize": ("resize  ", 5),
 }
 
 
 def draw_title(data):
-    tab = get_boss().tab_for_id(data["tab_id"])
+    tab = get_boss().tab_for_id(data["tab"].tab_id)
 
     if tab is None or not tab.name:
         return DEFAULT_TITLE
