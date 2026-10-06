@@ -144,7 +144,7 @@ for f in "${unsynced[@]}"; do
 	local_path=$HOME/$f
 	exists "$dots_path" &&
 		mkdir -p "${local_path%/*}" &&
-		ln -sT "$dots_path" "$local_path" &&
+		ln -s "$dots_path" "$local_path" &&
 		continue
 	failed+=("$f")
 done
@@ -153,8 +153,8 @@ for f in "${local_only[@]}"; do
 	local_path=$HOME/$f
 	! exists "$dots_path" &&
 		mkdir -p "${dots_path%/*}" &&
-		mv -nT "$local_path" "$dots_path" &&
-		ln -sT "$dots_path" "$local_path" &&
+		mv -n "$local_path" "$dots_path" &&
+		ln -s "$dots_path" "$local_path" &&
 		continue
 	failed+=("$f")
 done
@@ -162,7 +162,7 @@ for f in "${conflicts[@]}"; do
 	exists "$PWD/$f" &&
 		[[ ! "$HOME/$f" -ef "$PWD/$f" ]] &&
 		rm -rf "$HOME/$f" &&
-		ln -sT "$PWD/$f" "$HOME/$f" &&
+		ln -s "$PWD/$f" "$HOME/$f" &&
 		continue
 	failed+=("$f")
 done
