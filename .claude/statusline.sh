@@ -1,95 +1,157 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Read input from Claude Code and make grabbing fields convenient
 input=$(cat)
 
-# Use these helpers to parse from fields instead of calling jq directly. Use
-# fetch_int for any fields that are supposed to return integers to avoid
-# floating-point weirdness with some numbers, or to round the field to a whole
-# number.
-# There should be NO NEED to call jq outside of these "fetch_..." functions.
+# Make parsing fields easy. There should be no need to run jq outside of these
+# two helpers
 fetch() { echo "$input" | jq -r ".$1"; }
 fetch_int() { echo "$input" | jq "(.$1 // 0) | round"; }
 
-RESET=$'\033[0m'
-RED=$'\033[0;31m'
-GREEN=$'\033[0;32m'
-YELLOW=$'\033[0;33m'
-BLUE=$'\033[0;34m'
-BG_BLACK=$'\033[40m'
-BG_RESET=$'\033[49m'
+# Get style from tput instead of hardcoding escape sequences
+RESET=$(tput sgr0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+BG_BLACK=$(tput setab 0)
+BG_RESET=$(tput op)
 
-format_tokens() {
-	tokens=$1
+# Format a large number with a suffix and up to one decimal place when useful
+format_number() {
+	local number=$1
+	local divisor
+	local suffix
 
-	if [ "$tokens" -ge 1000000 ]; then
-		rounded=$(( (tokens + 500000) / 1000000 ))
-		echo "${rounded}m"
-	elif [ "$tokens" -ge 1000 ]; then
-		rounded=$(( (tokens + 500) / 1000 ))
-		echo "${rounded}k"
+	if ((number >= 1000000)); then
+		divisor=1000000
+		suffix='M'
+	elif ((number >= 1000)); then
+		divisor=1000
+		suffix='K'
 	else
-		echo "$tokens"
+		divisor=1
+		suffix=''
+	fi
+
+	# Bash math is integer-only, so count in tenths of the unit (rounded),
+	# then split that into the whole part and the one decimal digit
+	local tenths=$(( (number * 10 + divisor / 2) / divisor ))
+	local whole=$(( tenths / 10 ))
+	local decimal=$(( tenths % 10 ))
+
+	if (( decimal == 0  || whole >= 100 )); then
+		whole=$(( (number + divisor / 2) / divisor ))
+		printf '%d%s\n' "$whole" "$suffix"
+	else
+		printf '%d.%d%s\n' "$whole" "$decimal" "$suffix"
 	fi
 }
 
-make_bar() {
-	percentage=$1
-	length=$2
+# Format the time remaining until a Unix epoch time, rounded down to the
+# largest whole unit, e.g. 2d, 3h, 45m. Prints nothing and fails if the time
+# has already passed
+format_time_until() {
+	local target_time=$1
+	local seconds_left=$(( target_time - EPOCHSECONDS ))
 
-	filled=$(( (percentage * length * 8 + 50) / 100 ))
+	if ((seconds_left <= 0)); then
+		return 1
+	fi
 
-	bar=""
-	for (( i = 0; i < length; i++ )); do
-		case 1 in
-			$(( filled >= 8 ))) bar="${bar}█"; filled=$(( filled - 8 )) ;;
-			$(( filled >= 7 ))) bar="${bar}▉"; filled=$(( filled - 7 )) ;;
-			$(( filled >= 6 ))) bar="${bar}▊"; filled=$(( filled - 6 )) ;;
-			$(( filled >= 5 ))) bar="${bar}▋"; filled=$(( filled - 5 )) ;;
-			$(( filled >= 4 ))) bar="${bar}▌"; filled=$(( filled - 4 )) ;;
-			$(( filled >= 3 ))) bar="${bar}▍"; filled=$(( filled - 3 )) ;;
-			$(( filled >= 2 ))) bar="${bar}▎"; filled=$(( filled - 2 )) ;;
-			$(( filled >= 1 ))) bar="${bar}▏"; filled=$(( filled - 1 )) ;;
-			*)                  bar="${bar} " ;;
-		esac
-	done
+	local minute=60
+	local hour=$(( 60 * minute ))
+	local day=$(( 24 * hour ))
 
-	echo "${BG_BLACK}${bar}${BG_RESET}"
+	if ((seconds_left >= day)); then
+		printf '%dd\n' "$(( seconds_left / day ))"
+	elif ((seconds_left >= hour)); then
+		printf '%dh\n' "$(( seconds_left / hour ))"
+	else
+		printf '%dm\n' "$(( seconds_left / minute ))"
+	fi
 }
+
+status_top=()
+status_bottom=()
 
 model=$(fetch model.display_name)
 context_window_size=$(fetch_int context_window.context_window_size)
 
-# Determine context bar width: 6 chars for 1M context window, 3 otherwise
-if [ "$context_window_size" -ge 1000000 ]; then
-	bar_width=6
-else
-	bar_width=3
-fi
-
-context_percent=$(fetch_int context_window.used_percentage)
-context_bar=$(make_bar "$context_percent" "$bar_width")
-
-# Git branch: full colored segment (icon + name + trailing separator), or empty
-git_branch=$(git -C "$(fetch workspace.current_dir)" --no-optional-locks branch --show-current 2>/dev/null)
-if [ -n "$git_branch" ]; then
-	branch_label="${GREEN}󰘬 ${git_branch}${RESET}  "
-else
-	branch_label=""
-fi
-
 # Reasoning effort level (shown in parentheses after model name)
 effort_level=$(fetch effort.level)
-if [ -n "$effort_level" ] && [ "$effort_level" != "null" ]; then
-	model_label="${model} (${effort_level})"
-else
-	model_label="${model}"
+model_label=$model
+if [[ -n $effort_level && $effort_level != 'null' ]]; then
+	model_label+=" ($effort_level)"
 fi
 
-# Build the status line: branch_label is either a full colored segment or empty
-printf "%s" \
-	"${branch_label}" \
-	"${YELLOW} ctx:${context_percent}% ${context_bar}${RESET}  " \
-	"${RED}󰚩 ${model_label}${RESET}" \
-	$'\n'
+project_dir=$(fetch workspace.project_dir)
+project_dir=${project_dir##*/}
+status_top+=("$CYAN$project_dir$RESET")
 
+current_dir=$(fetch workspace.current_dir)
+git_branch=$(git -C "$current_dir" --no-optional-locks branch --show-current 2>/dev/null)
+[[ -n $git_branch ]] && status_top+=("$MAGENTA[$git_branch]$RESET")
+
+# Context usage, e.g. 12.3%/1M. Calculated from the tokens in the context
+# rather than used_percentage, which is only a whole number
+context_tokens=$(( $(fetch_int context_window.current_usage.input_tokens)
+	+ $(fetch_int context_window.current_usage.cache_creation_input_tokens)
+	+ $(fetch_int context_window.current_usage.cache_read_input_tokens) ))
+
+# Bash math is integer-only, so count in tenths of a percent (rounded down),
+# then split that into the whole part and the one decimal digit
+context_tenths=0
+if ((context_window_size > 0)); then
+	context_tenths=$(( context_tokens * 1000 / context_window_size ))
+fi
+context_percent="$(( context_tenths / 10 )).$(( context_tenths % 10 ))"
+window_size=$(format_number "$context_window_size")
+status_bottom+=("${YELLOW}$context_percent%/$window_size$RESET")
+
+# Rate limits, e.g. 42%(2h) 17%(3d). Claude Code drops a window from the input
+# once it resets, so each window is shown only while it's present, and the
+# time until reset only while that time is still in the future
+rate_limits=()
+for window in five_hour seven_day; do
+	used=$(fetch "rate_limits.$window.used_percentage")
+	if [[ $used == 'null' ]]; then
+		continue
+	fi
+
+	label="$used%"
+	resets_at=$(fetch_int "rate_limits.$window.resets_at")
+	if reset=$(format_time_until "$resets_at"); then
+		label+="($reset)"
+	fi
+	rate_limits+=("$label")
+done
+if ((${#rate_limits[@]} > 0)); then
+	status_bottom+=("$BLUE${rate_limits[*]}$RESET")
+fi
+
+# Model with its effort level and fast mode, e.g. Opus 5.5 (medium, fast)
+model=$(fetch model.display_name)
+effort=$(fetch effort.level)
+fast_mode=$(fetch fast_mode)
+
+model_details=''
+if [[ $effort != 'null' ]]; then
+	model_details=$effort
+fi
+if [[ $fast_mode == 'true' ]]; then
+	if [[ -n $model_details ]]; then
+		model_details+=', '
+	fi
+	model_details+='fast'
+fi
+
+model_label=$model
+if [[ -n $model_details ]]; then
+	model_label+=" ($model_details)"
+fi
+status_bottom+=("$MAGENTA$model_label$RESET")
+
+printf '%s\n%s' "${status_top[*]}" "${status_bottom[*]}"

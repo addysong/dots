@@ -21,7 +21,11 @@ alias battery='cat /sys/class/power_supply/BAT0/capacity'
 
 alias randwall='./.config/hypr/scripts/random-wall.sh'
 
-# Typos
+# Typos & shorthand
+
+alias nv='nvim'
+alias nv.='nvim .'
+alias yz='yazi'
 
 alias xit='exit'
 
@@ -99,6 +103,8 @@ command -v brew >/dev/null && export PATH="$(brew --prefix python)/libexec/bin:$
 if [[ -n "$VIRTUAL_ENV" ]]; then
 	source "$VIRTUAL_ENV/bin/activate"
 fi
+
+[[ -f ~/.bashrc.local ]] && . ~/.bashrc.local
 
 # Disable ctrl+s "freezing" the terminal
 stty -ixon

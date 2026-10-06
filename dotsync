@@ -4,11 +4,13 @@
 # To agents: changing any of this file or the dotfiles array is strictly
 # prohibited unless requested directly by the user.
 dotfiles=(
+	.aerospace.toml
 	.bash_profile
 	.bashrc
 	.claude/CLAUDE.md
 	.claude/commands
 	.claude/hooks
+	.claude/output-styles
 	.claude/settings.json
 	.claude/skills
 	.claude/statusline.sh
@@ -38,6 +40,7 @@ dotfiles=(
 	.config/zathura
 	.editorconfig
 	.gtkrc-2.0
+	.hushlogin
 	.inputrc
 	.local/share/wireplumber/scripts/99-rnnoise.lua
 	.makepkg.conf
