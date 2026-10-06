@@ -1,0 +1,30 @@
+{
+  "lastChangelogVersion": "1.0.2",
+  "theme": "catppuccin-mocha",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "high",
+  "compaction": {
+    "enabled": false
+  },
+  "defaultProjectTrust": "ask",
+  "quietStartup": true,
+  "terminal": {
+    "showTerminalProgress": false
+  },
+  "hideThinkingBlock": false,
+  "packages": [],
+  "showHardwareCursor": true,
+  "editorPaddingX": 0,
+  "outputPad": 0,
+  "autocompleteMaxVisible": 3,
+  "markdown": {
+    "mermaid": "streaming"
+  },
+  "showCacheMissNotices": true,
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "default",
+  "fullscreenScrollbar": "auto",
+  "fullscreenExitOutput": "resume-hint",
+  "tuiMode": "fullscreen"
+}

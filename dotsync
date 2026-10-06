@@ -5,6 +5,7 @@
 # prohibited unless requested directly by the user.
 dotfiles=(
 	.aerospace.toml
+	.agents/skills
 	.bash_profile
 	.bashrc
 	.claude/CLAUDE.md
@@ -44,6 +45,16 @@ dotfiles=(
 	.inputrc
 	.local/share/wireplumber/scripts/99-rnnoise.lua
 	.makepkg.conf
+	.pi/agent/AGENTS.md
+	.pi/agent/APPEND_SYSTEM.md
+	.pi/agent/extensions
+	.pi/agent/keybindings.json
+	.pi/agent/mcp.json
+	.pi/agent/models.json
+	.pi/agent/prompts
+	.pi/agent/settings.json
+	.pi/agent/skills
+	.pi/agent/themes
 	.tmux.conf
 	.vim
 	.vimrc
