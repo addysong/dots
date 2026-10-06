@@ -1,6 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_SCROLL_SPEED": "2"
+    "CLAUDE_CODE_SCROLL_SPEED": "1"
   },
   "permissions": {
     "allow": [
@@ -21,42 +21,14 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-opus-4-8",
+  "model": "opus",
   "skillOverrides": {
     "review": "user-invocable-only",
     "security-review": "user-invocable-only"
   },
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/herdr-agent-state.sh session",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat ~/.claude/context/style-injection.md 2>/dev/null || true",
-            "timeout": 5
-          }
-        ]
-      }
-    ]
-  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
-  },
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
   "promptSuggestionEnabled": false,

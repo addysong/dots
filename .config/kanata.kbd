@@ -55,7 +55,7 @@
 (deflayer base
        1    2    3    4    5    6    7    8    9    0    -    =
   tab  q    w    e    r    t    y    u    i    o    p
-  @ESC a    s    d    f    g    h    j    k    l    @SC  '
+  @ESC a    s    d    f    g    h    j    k    l    ;    '
   lsft @Z   @X   @C   v    b    n    m    @COM @DOT @SLH
                            @SPC
 )

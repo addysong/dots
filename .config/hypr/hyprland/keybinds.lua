@@ -27,11 +27,11 @@ hl.bind(mod("Q"), hl.dsp.window.close())
 
 -- Run terminal
 hl.bind(mod("T"), hl.dsp.exec_cmd(apps.terminal))
-hl.bind(mod("B"), hl.dsp.exec_cmd(apps.browser))
+hl.bind(mod("E"), hl.dsp.exec_cmd(apps.browser))
 hl.bind(mod("N"), hl.dsp.exec_cmd(apps.notes))
 
 -- TODO: Force a max size for the floating window
-hl.bind(mod("F"), function()
+hl.bind(mod("D"), function()
   hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
   hl.dispatch(hl.dsp.window.center())
 end)
@@ -39,7 +39,6 @@ end)
 hl.bind(mod("R"), hl.dsp.exec_cmd(apps.menu.desktop))
 hl.bind(mod_shift("R"), hl.dsp.exec_cmd(apps.menu.run))
 hl.bind(mod("C"), hl.dsp.exec_cmd(apps.menu.calc))
-hl.bind(mod("E"), hl.dsp.exec_cmd(apps.menu.emoji))
 hl.bind(mod("U"), hl.dsp.exec_cmd(apps.menu.unicode))
 
 -- Change drawing tablet display

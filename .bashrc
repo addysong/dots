@@ -14,6 +14,9 @@ alias clear='printf "\e[H\e[2J\e[3J"'
 
 # Utility commands
 
+alias powerlow='powerprofilesctl set power-saver'
+alias powermed='powerprofilesctl set balanced'
+alias powerhi='powerprofilesctl set performance'
 alias battery='cat /sys/class/power_supply/BAT0/capacity'
 
 alias randwall='./.config/hypr/scripts/random-wall.sh'

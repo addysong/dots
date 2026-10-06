@@ -1,4 +1,6 @@
-.config/fcitx5/
-.claude/skills/herdr
-.claude/hooks/herdr-agent-state.sh
-.claude/machine.md
+.claude/skills/synced/
+.config/fcitx5/conf/cached_layouts
+.config/hypr/temp/
+.config/kitty/kitty-local.conf
+.vim/.netrwhist
+local-exclude

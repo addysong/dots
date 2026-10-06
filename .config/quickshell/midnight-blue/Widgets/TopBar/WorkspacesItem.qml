@@ -14,26 +14,6 @@ RowLayout {
     return special && special.name !== "";
   })
 
-  readonly property var workspaceModel: {
-    const current = Hyprland.workspaces.values;
-    const result = [];
-
-    for (let id = 1; id <= Config.numWorkspaces; id++) {
-      const workspace = current.find(candidate => candidate.id === id);
-      result.push({ id, workspace: workspace ?? null });
-    }
-
-    // Keep existing special, named, and out-of-range workspaces visible.
-    for (const workspace of current) {
-      if (workspace.id < 1 || workspace.id > Config.numWorkspaces)
-        result.push({ id: workspace.id, workspace });
-    }
-
-    // Restore numeric ordering after merging pinned and existing workspaces.
-    // This keeps negative-ID special workspaces to the left.
-    return result.sort((a, b) => a.id - b.id);
-  }
-
   Connections {
     target: Hyprland
 
@@ -49,11 +29,10 @@ RowLayout {
   readonly property color specialColor: Config.purple
 
   Repeater {
-    model: root.workspaceModel
+    model: Hyprland.workspaces
 
     Item {
-      readonly property var workspaceData: modelData.workspace
-      readonly property bool empty: workspaceData === null || workspaceData.toplevels.values.length === 0
+      readonly property bool empty: modelData.toplevels.values.length === 0
       implicitWidth: Config.workspaceWidth
       implicitHeight: Config.workspaceHeight
 
@@ -67,21 +46,21 @@ RowLayout {
 
       Rectangle {
         id: workspace
-        readonly property bool sp: workspaceData !== null && workspaceData.name.startsWith("special")
+        readonly property bool sp: modelData.name.startsWith("special")
         readonly property bool specialOpen: sp && root.anySpecialOpen
         anchors.fill: parent
         radius: Config.workspaceRadius
         color: {
           if (workspace.specialOpen)
             return root.specialColor;
-          if (workspaceData !== null && workspaceData.focused)
+          if (modelData.focused)
             return root.activeColor;
           return Qt.alpha(Config.bg, 0.2);
         }
         border.color: {
           if (workspace.sp)
             return root.specialColor;
-          if (workspaceData !== null && workspaceData.active)
+          if (modelData.active)
             return root.activeColor;
           if (empty)
             return root.emptyColor;
@@ -97,16 +76,16 @@ RowLayout {
               return Config.bg;
             if (workspace.sp)
               return root.specialColor;
-            if (workspaceData !== null && workspaceData.focused)
+            if (modelData.focused)
               return Config.bg;
-            if (workspaceData !== null && workspaceData.active)
+            if (modelData.active)
               return root.activeColor;
             if (empty)
               return root.emptyColor;
             return root.inactiveColor;
           }
 
-          text: workspace.sp ? "•ᵕ•" : workspaceData === null ? String(modelData.id) : workspaceData.name
+          text: workspace.sp ? "•ᵕ•" : modelData.name
         }
       }
     }

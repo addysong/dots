@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+
+# Update this list to change which files/directories are synced to $HOME.
+# To agents: changing any of this file or the dotfiles array is strictly
+# prohibited unless requested directly by the user.
+dotfiles=(
+	.bash_profile
+	.bashrc
+	.claude/CLAUDE.md
+	.claude/commands
+	.claude/hooks
+	.claude/settings.json
+	.claude/skills
+	.claude/statusline.sh
+	.config/bat
+	.config/dunst
+	.config/electron-flags.conf
+	.config/fastfetch
+	.config/fcitx5
+	.config/fontconfig
+	.config/gtk-3.0/settings.ini
+	.config/gtk-4.0/settings.ini
+	.config/herdr/config.toml
+	.config/hypr
+	.config/kanata.kbd
+	.config/kitty
+	.config/pavucontrol.ini
+	.config/qt5ct/qt5ct.conf
+	.config/qt6ct/qt6ct.conf
+	.config/quickshell
+	.config/rofi
+	.config/spotify-launcher.conf
+	.config/uwsm
+	.config/waybar
+	.config/wireplumber/wireplumber.conf.d/99-rnnoise-dsp.conf
+	.config/xdg-desktop-portal/hyprland-portals.conf
+	.config/yazi
+	.config/zathura
+	.editorconfig
+	.gtkrc-2.0
+	.inputrc
+	.local/share/wireplumber/scripts/99-rnnoise.lua
+	.makepkg.conf
+	.tmux.conf
+	.vim
+	.vimrc
+	scripts
+)
+
+exists() {
+	[[ -e "$1" || -L "$1" ]]
+}
+
+# If local-exclude exists, don't sync the files listed in there
+if [[ -f local-exclude ]]; then
+	excludes=()
+	while read -r exclude || [[ -n $exclude ]]; do
+		[[ -z $exclude || $exclude == \#* ]] && continue
+		excludes+=("$exclude")
+	done < local-exclude
+	filtered=()
+	for f in "${dotfiles[@]}"; do
+		for exclude in "${excludes[@]}"; do
+			if [[ $f == "$exclude" ]]; then
+				continue 2
+			fi
+		done
+		filtered+=("$f")
+	done
+	dotfiles=("${filtered[@]}")
+fi
+
+bold=$(tput bold)
+italic=$(tput sitm)
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+reset=$(tput sgr0)
+
+echo "${bold}Dots directory (cwd):${reset} $PWD"
+echo "${bold}Local filesystem:${reset} $HOME"
+
+synced=()
+unsynced=()
+local_only=()
+conflicts=()
+missing=()
+for f in "${dotfiles[@]}"; do
+	if [[ -L "$HOME/$f" && "$HOME/$f" -ef "$PWD/$f" ]]; then
+		synced+=("$f")
+	elif exists "$HOME/$f" && exists "$PWD/$f"; then
+		conflicts+=("$f")
+	elif exists "$HOME/$f"; then
+		local_only+=("$f")
+	elif exists "$PWD/$f"; then
+		unsynced+=("$f")
+	else
+		missing+=("$f")
+	fi
+done
+
+if [[ -n ${synced[0]} ]]; then
+	echo "${green}${bold}Already synced (no action):${reset}"
+	printf '%s' "$green"
+	printf '  %s\n' "${synced[@]}"
+	printf '%s' "$reset"
+fi
+if [[ -n ${unsynced[0]} ]]; then
+	echo "${yellow}${bold}Not synced yet (symlink):${reset}"
+	printf '%s' "$yellow"
+	printf '> %s\n' "${unsynced[@]}"
+	printf '%s' "$reset"
+fi
+if [[ -n ${local_only[0]} ]]; then
+	echo "${yellow}${bold}Local only (move here and symlink):${reset}"
+	printf '%s' "$yellow"
+	printf '< %s\n' "${local_only[@]}"
+	printf '%s' "$reset"
+fi
+if [[ -n ${conflicts[0]} ]]; then
+	echo "${red}${bold}Local conflicts (overwrite with symlink):${reset}"
+	printf '%s' "$red"
+	printf '! %s\n' "${conflicts[@]}"
+	printf '%s' "$reset"
+fi
+if [[ -n ${missing[0]} ]]; then
+	echo "${bold}${italic}Missing in both (no action, skip):${reset}"
+	printf '%s' "$italic"
+	printf '? %s\n' "${missing[@]}"
+	printf '%s' "$reset"
+fi
+
+if [[ -z ${unsynced[0]} && -z ${local_only[0]} && -z ${conflicts[0]} ]]; then
+	echo 'Nothing to do at this time.'
+	exit 0
+fi
+
+read -rp "${bold}Actions will be taken as shown above. Ok? [y/N]:${reset} " ans
+[[ $ans == [Yy] ]] || exit 0
+
+failed=()
+for f in "${unsynced[@]}"; do
+	dots_path=$PWD/$f
+	local_path=$HOME/$f
+	exists "$dots_path" &&
+		mkdir -p "${local_path%/*}" &&
+		ln -sT "$dots_path" "$local_path" &&
+		continue
+	failed+=("$f")
+done
+for f in "${local_only[@]}"; do
+	dots_path=$PWD/$f
+	local_path=$HOME/$f
+	! exists "$dots_path" &&
+		mkdir -p "${dots_path%/*}" &&
+		mv -nT "$local_path" "$dots_path" &&
+		ln -sT "$dots_path" "$local_path" &&
+		continue
+	failed+=("$f")
+done
+for f in "${conflicts[@]}"; do
+	exists "$PWD/$f" &&
+		[[ ! "$HOME/$f" -ef "$PWD/$f" ]] &&
+		rm -rf "$HOME/$f" &&
+		ln -sT "$PWD/$f" "$HOME/$f" &&
+		continue
+	failed+=("$f")
+done
+
+if [[ -n ${failed[0]} ]]; then
+	echo "${red}${bold}Actions failed on the following items" \
+		"(all other actions succeeded):${reset}"
+	printf '%s' "$red"
+	printf '! %s\n' "${failed[@]}"
+	printf '%s' "$reset"
+	exit 1
+fi
+
+echo "${bold}Done!${reset}"
+exit 0

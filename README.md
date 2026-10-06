@@ -5,12 +5,8 @@ This directory contains most of my dotfiles. Some are cross-platform, and others
 ## Installation
 
 1. Clone this repo into your home directory.
-2. Ensure the following directories exist if you intend to use them so Stow symlinks at the correct level:
-    - `~/.claude`
-    - `~/.vim`
-    - `~/.config/kitty`
-3. _(optional)_ Add `--ignore` lines into `~/.stowrc` for directories you don't need symlinked. Wrap in single quotes and escape periods. Example line: `--ignore='\.config/hypr'`
-4. `cd` into the repo (e.g. `~/dots/`) and run `stow .` OR copy files manually if you don't want to apply all of them.
+2. Add any files/directories you don't want included into a `sync-exclude` file in this repo.
+3. Run `./dotsync`.
 
 If any config files already exist on the machine, there are two options to resolve conflicts:
 

@@ -15,7 +15,7 @@ hl.config({
     border_size = 2,
 
     col = {
-      active_border = { colors = { colors.sky, colors.sapphire }, angle = 90 },
+      active_border = { colors = { colors.blue, colors.sapphire }, angle = 90 },
       inactive_border = colors.shadow,
     },
 

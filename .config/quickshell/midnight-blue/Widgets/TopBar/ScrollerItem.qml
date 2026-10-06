@@ -147,8 +147,8 @@ RowLayout {
       Rectangle {
         id: blip
         anchors.centerIn: parent
-        width: parent.focused ? 3 : 4
-        height: parent.focused ? Math.round(Config.workspaceHeight * 0.6) : 4
+        width: parent.focused ? Config.scrollerLineWidth : Config.scrollerDotSize
+        height: parent.focused ? Math.round(Config.scrollerHeight) : Config.scrollerDotSize
         radius: width / 2
         color: parent.focused ? Config.blue : Config.text1
       }

@@ -53,7 +53,10 @@ Singleton {
   readonly property int workspaceWidth: 24
   readonly property int workspaceHeight: 16
   readonly property int workspaceBorderWidth: 1
-  readonly property int workspaceRadius: 4
+  readonly property int workspaceRadius: 3
   readonly property int workspaceSpacing: 4
-  readonly property int numWorkspaces: 6
+  // Scroller
+  readonly property int scrollerHeight: 10
+  readonly property int scrollerDotSize: 4
+  readonly property int scrollerLineWidth: 3
 }
